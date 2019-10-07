@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+{% if user %}
+  <h1>Hello {{ user }}</h1>
+{% endif %}
+
+
+<table class="table table-dark">
+  {% for runner in runners %}
+    
+      <TR>
+        <TD>{{ runner.market.marketStartTime }}</TD>
+        <TD>{{ runner.market.marketId }}</TD>
+        <TD>      </TD>
+        <TD>      </TD>
+        <TD>{{ runner.market.course }}</TD>
+        <TD>{{ runner.selectionId }}</TD>
+        <TD>{{ runner.runnerName }}</TD>
+        <TD>      </TD>
+      </TR>
+  {% endfor %}
+</table>
+
+
+
+{% endblock %}

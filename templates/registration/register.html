@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Registration</h1>
+
+<div class="container">
+    <form method="post">
+
+        {% csrf_token %} 
+    
+        {% if form.errors %}
+            <p>There is something wrong with what you entered</p>
+        {% endif %}
+    
+        {{ form.as_p }}
+    
+        <input type="submit" value="Register">
+            
+    </form>
+            
+</div>
+
+{% endblock %}
