@@ -1,7 +1,9 @@
 from django import forms
 from .models import User
 import requests
-from keys import app_key
+from . import keys
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 # class RegistrationForm(forms.ModelForm):
 #     username = forms.CharField(label='Username')
@@ -19,7 +21,7 @@ class LoginForm(forms.Form):
 
     def log_betfair(self, username, password):
         LoginForm.payload = 'username='+username+'&password='+password
-        LoginForm.headers = {'X-Application': app_key, 'Content-Type': 'application/x-www-form-urlencoded'}
+        LoginForm.headers = {'X-Application': keys.app_key, 'Content-Type': 'application/x-www-form-urlencoded'}
         resp = requests.post('https://identitysso-cert.betfair.com/api/certlogin', data=self.payload, cert=('/home/gary/Desktop/Development/Betfair/Python/betfair/login/client-2048.crt', '/home/gary/Desktop/Development/Betfair/Python/betfair/login/client-2048.key'), headers=self.headers)
 
         if resp.status_code == 200:
@@ -31,4 +33,11 @@ class LoginForm(forms.Form):
         else:
             print("Request failed.")  
                     
-    
+class GenerateRandomUserForm(forms.Form):
+    total = forms.IntegerField(
+        validators=[
+            MinValueValidator(50),
+            MaxValueValidator(500)
+        ]
+    )
+

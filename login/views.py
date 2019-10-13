@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from .models import Login, Market, Runner
+from .models import Login, Market, Runner, SportsAPI
 from .forms import LoginForm
+from .tasks import timer_tick, add
 from django.views.generic import TemplateView
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponse
@@ -14,6 +15,8 @@ import time
 
 from .api_logic.SportsAPI import *
 from .api_logic.Form1 import *
+
+sports_api = None
 
 class LoginView(TemplateView):
     template_name = 'registration/login.html'
@@ -75,16 +78,25 @@ class WelcomeUser(LoginView):
 
     def get(self, request):
         self.sports_api = SportsAPI_(self.form.payload, self.form.ssoid, self.form.headers)
+        
+        self.data_request()
+
+        # timer_tick.delay(self.sports_api.model_instance.id)
+        timer_tick.delay(self.sports_api.model_instance.id)
+        add_result = add.delay(3, 3)
+        args = {'runners':  self.runners, 'add_result': add_result}
+        return render(request, self.template_name, args)
+        
+
+    # def timer_tick(self):
+    #     ListMarketBook(self.sports_api)
+    #     CheckMarkets()
+    #     time.sleep(5)
+
+    def data_request(self):
         self.sports_api.send_sports_req({"jsonrpc": "2.0", "method": "SportsAPING/v1.0/listEventTypes", "params": {"filter":{}}, "id": 1})
         self.market_catalogue_req = MarketCatalogueRequest()
         self.form = Form(self.market_catalogue_req, self.market_catalogue_req.params, self.market_catalogue_req.params.filter.marketStartTime) 
         allMarkets = self.form.ListMarketCatalogue(self.sports_api)
         BuildListMarketBookRequests()
-        runners = Runner.objects.all()
-        args = {'runners': runners}
-        return render(request, self.template_name, args)
-
-    def timer_tick(self):
-        ListMarketBook(self.sports_api)
-        CheckMarkets()
-        time.sleep(5)
+        self.runners = Runner.objects.all()

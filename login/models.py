@@ -26,4 +26,12 @@ class Runner(models.Model):
     def __str__(self):
         return self.selectionId
 
-    
+class SportsAPI(models.Model):
+    id = models.AutoField(primary_key=True)
+    payload = models.CharField(max_length=400, unique=False)
+    url = models.CharField(max_length=100, unique=False)
+    headers = models.CharField(max_length=200, unique=False)
+    path_cert = models.CharField(max_length=200, unique=False)
+
+    def __str__(self):
+        return self.payload

@@ -1,10 +1,28 @@
-# Create your tasks here
-from __future__ import absolute_import, unicode_literals
-from celery import Celery
+# import string
 
+from __future__ import absolute_import
 
-app = Celery('tasks', broker='amqp://localhost//', backend='db+sqlite:///results.sqlite')
+from celery import shared_task
+from .models import SportsAPI
+from celery import shared_task
+import time
+from .api_logic.SportsAPI import *
+from .api_logic.Form1 import *
+from django.http import HttpResponse
 
-@app.task
-def reverse(string):
-    return string[::-1]
+@shared_task
+def timer_tick(sapi_model_id):
+    print("sapi_model_id", sapi_model_id)
+    sapi_model = SportsAPI.objects.get(pk=sapi_model_id)
+    
+    while True:
+        ListMarketBook(sapi_model)
+        CheckMarkets()
+        time.sleep(5)
+        print("repeat")
+        
+
+@shared_task
+def add(x, y):
+    return x + y
+   

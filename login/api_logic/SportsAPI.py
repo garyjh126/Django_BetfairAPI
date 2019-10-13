@@ -2,6 +2,7 @@ import requests
 import json
 from json import JSONEncoder
 import pdb
+from login.models import SportsAPI
 
 
 class SportsAPI_():
@@ -12,6 +13,9 @@ class SportsAPI_():
         self.headers = headers
         self.url = 'https://api.betfair.com/exchange/betting/json-rpc/v1'
         self.path_cert = '/home/gary/Desktop/Development/Betfair/Python/betfair/login/'
+        
+        self.model_instance, created = SportsAPI.objects.get_or_create(payload = self.payload, headers = str(self.headers), url = self.url, path_cert = self.path_cert)
+        print("__init__", self.model_instance.id, created)
 
     def send_sports_req(self, my_json):
         # INSERT YOUR OWN CERT HERE
@@ -99,9 +103,8 @@ class custom_encoder(JSONEncoder):
 class Payload(object):
 
     def __init__(self, j): 
-        a = j.replace("True", "'TRUE'").replace("False", "'FALSE'").replace('"', "'").replace("'", '"').replace('""TRUE"', '"True').replace('""FALSE"', '"False') # Bug Fixed: Runners sometimes contain the name 'True ..' or 'False ..'
+        a = j.replace(": True", ": 'TRUE'").replace(": False", ": 'FALSE'").replace('"', "'").replace("'", '"')
         self.__dict__ = json.loads(a)
-    
    
 # Classes and function for listMarketCatalogue response
 class MarketCatalogueResponse():
