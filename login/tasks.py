@@ -20,9 +20,5 @@ def timer_tick(sapi_model_id):
         CheckMarkets()
         time.sleep(5)
         print("repeat")
-        
 
-@shared_task
-def add(x, y):
-    return x + y
    

@@ -6,6 +6,8 @@ from login.models import Market, Runner
 
 marketDictionary = {}
 bookRequestList = []
+runners_db = Runner.objects.all()
+
 class MarketDetail: 
     def __init__(self):
         self.marketId = ""
@@ -87,7 +89,9 @@ class Form():
                 my_data_dict.append(str(data))
                 # Add code to add rows to django model
                 runner = Runner(market = market, selectionId = allMarkets.result[n].runners[m].selectionId, runnerName = allMarkets.result[n].runners[m].runnerName, runnerStatus='')
-                runner.save()
+
+                if runner not in runners_db:
+                    runner.save()
 
 
                 if not (allMarkets.result[n].runners[m].selectionId in runnerDictionary):

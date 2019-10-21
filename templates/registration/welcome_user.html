@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
+{% load staticfiles %}
+{% block websocketlink %}<script src="{% static '/channels/js/websocketbridge.js' %}" type="text/javascript"></script>{% endblock %}
+
 {% block content %}
+
 
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
@@ -11,6 +15,16 @@
   <h2> {{ add_result }} </h2>
 {% endif %}
 
+<div>
+  <div>
+      <button id="sync_reload">Sync Fetch</button>
+      <button id="async_reload">Async Fetch</button>
+  </div>
+  <br />
+  <div id="message" style="color: #5579BE; padding: 6px;"></div>
+  <div id="news" style="color: #aaa; padding: 6px;">
+  </div>
+</div>
 
 <table class="table table-dark">
   {% for runner in runners %}
@@ -27,6 +41,63 @@
       </TR>
   {% endfor %}
 </table>
+
+{% load staticfiles %}
+
+<script>
+  // document.addEventListener('DOMContentLoaded', function() {
+  //   const webSocketBridge = new channels.WebSocketBridge();
+  //   webSocketBridge.connect('/ws/');
+  //   webSocketBridge.listen(function(action, stream){
+  //     console.log("RESPONSE: ", action);
+  //   })
+  //   document.ws = webSocketBridge; /* for debugging */ 
+  // })
+
+  $(function () {
+
+    $("#sync_reload").on('click', function(event) {
+        reload_news(true);
+    });
+
+    $("#async_reload").on('click', function(event) {
+        reload_news(false);
+    });
+
+    var t0 = null;
+    var sync_mode = true;
+
+    // Ask to remote server to collect news
+    function reload_news(sync) {
+        $('#message').text('Loading ...');
+        $('#news').text('');
+
+        t0 = new Date();
+        var url = sync ? 'collector/collect_news_sync/' : 'collector/collect_news_async/';
+        sync_mode = sync;
+
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: {},
+            cache: false,
+            crossDomain: false,
+            dataType: 'json'
+        }).done(function(data) {
+            on_news_received(data);
+        });
+    }
+
+    // Display news received from remote server
+    function on_news_received(data) {
+        
+        var num_pages = Object.keys(data).length;
+        $('#message').text(data);
+        $('#news').text(Object.keys(data));
+    }
+
+  });
+</script>
 
 
 
