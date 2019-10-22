@@ -73,32 +73,26 @@ class Form():
         req = sports_api.send_sports_req(serialization)
         allMarkets = DeserializeMarketCatalogueResponse(req) # Magic line
 
-        my_data_dict = []
+        my_data = []
         
         for n in range(len(allMarkets.result)): # Loops through each market in the reuslt
-
             detail = MarketDetail()
             detail.marketId = allMarkets.result[n].marketId
             detail.removed = False
             marketDictionary.update({allMarkets.result[n].marketId: detail})
             course = allMarkets.result[n].event.name.split()
-            market = Market(marketStartTime=allMarkets.result[n].marketStartTime, marketId = allMarkets.result[n].marketId, marketStatus='', inPlay='', course=course[0]+ " " + allMarkets.result[n].marketName, back=0.0, lay = 0.0)
-            market.save()
             for m in range(len(allMarkets.result[n].runners)): # Loops through each runner in market
                 data = allMarkets.result[n].marketStartTime[11:16] + " " + course[0] + " " + allMarkets.result[n].marketName + " " + allMarkets.result[n].runners[m].runnerName 
-                my_data_dict.append(str(data))
-                # Add code to add rows to django model
-                runner = Runner(market = market, selectionId = allMarkets.result[n].runners[m].selectionId, runnerName = allMarkets.result[n].runners[m].runnerName, runnerStatus='')
-
-                if runner not in runners_db:
-                    runner.save()
-
+                
 
                 if not (allMarkets.result[n].runners[m].selectionId in runnerDictionary):
                     data = RunnerDetail()
                     data.marketId = allMarkets.result[n].marketId
                     runnerDictionary.update( { allMarkets.result[n].runners[m].selectionId: data } )
 
+                my_data.append(str(data))
+
+        return marketDictionary, runnerDictionary, my_data
             
 
 

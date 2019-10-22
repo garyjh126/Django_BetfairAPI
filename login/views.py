@@ -79,8 +79,9 @@ class WelcomeUser(LoginView):
     def get(self, request):
         self.sports_api = SportsAPI_(self.form.payload, self.form.ssoid, self.form.headers)
         self.data_request()
-        timer_tick.delay(self.sports_api.model_instance.id)
-        args = {'runners':  self.runners}
+        # timer_tick.delay(self.sports_api.model_instance.id)
+        pdb.set_trace()
+        args = {'runners': 'dd' }
         return render(request, self.template_name, args)
 
 
@@ -88,6 +89,6 @@ class WelcomeUser(LoginView):
         # self.sports_api.send_sports_req({"jsonrpc": "2.0", "method": "SportsAPING/v1.0/listEventTypes", "params": {"filter":{}}, "id": 1})
         self.market_catalogue_req = MarketCatalogueRequest()
         self.form = Form(self.market_catalogue_req, self.market_catalogue_req.params, self.market_catalogue_req.params.filter.marketStartTime) 
-        allMarkets = self.form.ListMarketCatalogue(self.sports_api)
+        self.allMarkets = self.form.ListMarketCatalogue(self.sports_api)
         BuildListMarketBookRequests()
-        self.runners = Runner.objects.all()
+        # self.runners = Runner.objects.all()
