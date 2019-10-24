@@ -13,6 +13,8 @@ class Market(models.Model):
     back = models.FloatField(max_length=50)
     lay = models.FloatField(max_length=50)
 
+    # marketStartTime = '', marketId='', marketStatus='', inPlay='',course='',back=0.0,lay=0.0    
+    
     class Meta:
         ordering = ('marketStartTime',)
 
@@ -22,6 +24,8 @@ class Runner(models.Model):
     selectionId = models.CharField(max_length=50, primary_key=True)
     runnerName = models.CharField(max_length=50)
     runnerStatus = models.CharField(max_length=50)
+
+    # market=market, selectionId='', runnerName='', runnerStatus=''
 
     def __str__(self):
         return self.selectionId

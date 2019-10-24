@@ -26,6 +26,9 @@
   </div>
 </div>
 
+<p>Notifications</p>
+<ul id="notifylist"></ul>
+
 <table class="table table-dark">
   {% for runner in runners %}
     
@@ -45,58 +48,22 @@
 {% load staticfiles %}
 
 <script>
-  // document.addEventListener('DOMContentLoaded', function() {
-  //   const webSocketBridge = new channels.WebSocketBridge();
-  //   webSocketBridge.connect('/ws/');
-  //   webSocketBridge.listen(function(action, stream){
-  //     console.log("RESPONSE: ", action);
-  //   })
-  //   document.ws = webSocketBridge; /* for debugging */ 
-  // })
-
-  $(function () {
-
-    $("#sync_reload").on('click', function(event) {
-        reload_news(true);
-    });
-
-    $("#async_reload").on('click', function(event) {
-        reload_news(false);
-    });
-
-    var t0 = null;
-    var sync_mode = true;
-
-    // Ask to remote server to collect news
-    function reload_news(sync) {
-        $('#message').text('Loading ...');
-        $('#news').text('');
-
-        t0 = new Date();
-        var url = sync ? 'collector/collect_news_sync/' : 'collector/collect_news_async/';
-        sync_mode = sync;
-
-        $.ajax({
-            type: "GET",
-            url: url,
-            data: {},
-            cache: false,
-            crossDomain: false,
-            dataType: 'json'
-        }).done(function(data) {
-            on_news_received(data);
-        });
-    }
-
-    // Display news received from remote server
-    function on_news_received(data) {
-        
-        var num_pages = Object.keys(data).length;
-        $('#message').text(data);
-        $('#news').text(Object.keys(data));
-    }
-
-  });
+    document.addEventListener('DOMContentLoaded', function() {
+      const webSocketBridge = new channels.WebSocketBridge();
+      const nl = document.querySelector("#notifylist");
+      
+      webSocketBridge.connect('/notifications/');
+      webSocketBridge.listen(function(action, stream) {
+        console.log("RESPONSE:", action);
+        if(action.event == "New Runner") {
+          var el = document.createElement("li");
+          el.innerHTML = `New runner <b>${action.runnerId}</b> has joined!`;
+          nl.appendChild(el);
+        }
+      })
+      document.ws = webSocketBridge; /* for debugging */
+    })
+  
 </script>
 
 
