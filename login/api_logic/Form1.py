@@ -76,7 +76,9 @@ class Form():
         my_data_dict = []
         market_list = []
         
-
+        Runner.objects.all().delete()
+        Market.objects.all().delete()
+        runner_di = {}
         for n in range(len(allMarkets.result)): # Loops through each market in the reuslt
 
             detail = MarketDetail()
@@ -85,36 +87,24 @@ class Form():
             marketDictionary.update({allMarkets.result[n].marketId: detail})
             course = allMarkets.result[n].event.name.split()
             market = Market(marketStartTime=allMarkets.result[n].marketStartTime, marketId = allMarkets.result[n].marketId, marketStatus='', inPlay='', course=course[0]+ " " + allMarkets.result[n].marketName, back=0.0, lay = 0.0)
-            market_list.append(market)
-            runner_list = []
-            runners = Runner.objects.all()
+            market_list.append( {'marketStartTime':allMarkets.result[n].marketStartTime, 'marketId' : allMarkets.result[n].marketId, 'marketStatus':'', 'inPlay':'', 'course':course[0]+ " " + allMarkets.result[n].marketName, 'back':0.0, 'lay' : 0.0 })
+            runner_di[market.marketId] = []
+            # runners = Runner.objects.all()
             for m in range(len(allMarkets.result[n].runners)): # Loops through each runner in market
                 data = allMarkets.result[n].marketStartTime[11:16] + " " + course[0] + " " + allMarkets.result[n].marketName + " " + allMarkets.result[n].runners[m].runnerName 
                 my_data_dict.append(str(data))
-                # Add code to add rows to django model
-                # runner = Runner(market = market, selectionId = allMarkets.result[n].runners[m].selectionId, runnerName = allMarkets.result[n].runners[m].runnerName, runnerStatus='')
-                # pdb.set_trace()
-                selectionIds = [runner.selectionId for runner in runners ]
-                if allMarkets.result[n].runners[m].selectionId in selectionIds:
-                    pdb.set_trace()
-                runner_list.append( {'market' : market, 'selectionId' : allMarkets.result[n].runners[m].selectionId, 'runnerName' : allMarkets.result[n].runners[m].runnerName, 'runnerStatus':''} )
-                # if runner not in runners_db:
-                # runner_list.append(runner)
+                runner_di[market.marketId].append( {'market' : market, 'selectionId' : allMarkets.result[n].runners[m].selectionId, 'runnerName' : allMarkets.result[n].runners[m].runnerName, 'runnerStatus':''} )
 
                 if not (allMarkets.result[n].runners[m].selectionId in runnerDictionary):
                     data = RunnerDetail()
                     data.marketId = allMarkets.result[n].marketId
                     runnerDictionary.update( { allMarkets.result[n].runners[m].selectionId: data } )
+           
 
+        # Markets must be commited before runners in the database as the 
+        # runners rely on them for foreign key
 
-            # pdb.set_trace()
-            market.save()
-            runner_l = [Runner(**runner_list[i]) for i in range(len(allMarkets.result[n].runners))]
-            Runner.objects.bulk_create(runner_l)
-    
-            # Unique constraint failed error may be due to replicate runner already 
-            # in database. 
-        
+        bulk_create_marketandrunner(allMarkets, market_list, runner_di)
 
 
     def get_dateTime(self, dlst = False):
@@ -132,6 +122,11 @@ class Form():
         return tf[0]+'-'+tf[1]+'-'+tf[2]+'T'+tf[3]+':'+tf[4]+':'+tf[5]+'Z'
 
 
+def bulk_create_marketandrunner(allMarkets, market_list, runner_di):
+    market_l = [Market(**market_list[i]) for i in range(len(allMarkets.result))]
+    Market.objects.bulk_create(market_l)
+    runner_l = [Runner(**runner_di[market.marketId][runner_no]) for market in market_l for runner_no in range(len(runner_di[market.marketId]))]
+    Runner.objects.bulk_create(runner_l)
 
 def BuildListMarketBookRequests():
 
