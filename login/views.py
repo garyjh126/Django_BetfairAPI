@@ -80,7 +80,6 @@ class WelcomeUser(LoginView):
         self.sports_api = SportsAPI_(self.form.payload, self.form.ssoid, self.form.headers)
         self.data_request()
         # timer_tick.delay(self.sports_api.model_instance.id)
-        pdb.set_trace()
         args = {'runners': 'dd' }
         return render(request, self.template_name, args)
 
