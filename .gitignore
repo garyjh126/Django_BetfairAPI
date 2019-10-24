@@ -3,4 +3,4 @@ login/client-2048.key
 betfair/settings.py
 login/keys.py
 login/__pycache__/*
-db.sqlite3
+./db.sqlite3
