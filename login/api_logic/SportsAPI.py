@@ -3,23 +3,31 @@ import json
 from json import JSONEncoder
 import pdb
 from login.models import SportsAPI
-
+from login.keys import app_key
+import ast
 
 class SportsAPI_():
+    payload = ''
+    headers = {}
+    url = 'https://api.betfair.com/exchange/betting/json-rpc/v1'
+    path_cert = '/home/gary/Desktop/Development/Betfair/Python/betfair/login/'
 
     def __init__(self, payload, ssoid, headers):
-        self.payload = payload
-        headers.update({'X-Authentication': ssoid, 'Content-Type': 'application/json'}) 
-        self.headers = headers
-        self.url = 'https://api.betfair.com/exchange/betting/json-rpc/v1'
-        self.path_cert = '/home/gary/Desktop/Development/Betfair/Python/betfair/login/'
-        
+        self.global_init(payload, headers)
+        headers.update({'X-Application': app_key, 'X-Authentication': ssoid, 'Content-Type': 'application/json'}) 
         self.model_instance, created = SportsAPI.objects.get_or_create(payload = self.payload, headers = str(self.headers), url = self.url, path_cert = self.path_cert)
-        print("__init__", self.model_instance.id, created)
+    
+    @classmethod
+    def global_init(cls, payload, headers):
+        cls.payload = payload 
+        cls.headers = headers
 
-    def send_sports_req(self, my_json):
+    @classmethod
+    def send_sports_req(cls, my_json):
         # INSERT YOUR OWN CERT HERE
-        req = requests.post(self.url, data=json.dumps(my_json), cert=(self.path_cert+'client-2048.crt', self.path_cert+'client-2048.key'), headers=self.headers) 
+        headers = ast.literal_eval(SportsAPI.objects.all().order_by('-id')[0].headers)
+        print("headerstime", headers )
+        req = requests.post(cls.url, data=json.dumps(my_json), cert=(cls.path_cert+'client-2048.crt', cls.path_cert+'client-2048.key'), headers=headers) 
         print("send_sports_req:", req.status_code)
         return req.json()
 
@@ -131,10 +139,10 @@ class MarketCatalogue:
     def populate_runners(self, runners):
         runner_list = []
         for runner in runners:
-            runner_list.append(Runner(runner))
+            runner_list.append(Runner_(runner))
         return runner_list
 
-class Runner:
+class Runner_:
     def __init__(self, runner):
         self.selectionId = runner['selectionId']
         self.runnerName = runner['runnerName']
@@ -325,6 +333,7 @@ def GetRawBook(jsonRequest, sports_api):
 
 def DeserializeRawBook(jsonResponse):
     dsjson = Payload(str(jsonResponse))
+    print("data", json.dumps(jsonResponse, indent=4, sort_keys=True))
     market_book_response = MarketBookResponse(dsjson.jsonrpc, dsjson.result, dsjson.id)
     return market_book_response
 

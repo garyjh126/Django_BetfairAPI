@@ -30,6 +30,10 @@ class Runner(models.Model):
     def __str__(self):
         return self.selectionId
 
+    class Meta: 
+        unique_together = (('market', 'selectionId'),)
+
+
 class SportsAPI(models.Model):
     id = models.AutoField(primary_key=True)
     payload = models.CharField(max_length=400, unique=False)
@@ -39,3 +43,21 @@ class SportsAPI(models.Model):
 
     def __str__(self):
         return self.payload
+
+class Form(models.Model):
+    id = models.AutoField(primary_key=True)
+    request = models.CharField(max_length=400, unique=False)
+    params = models.CharField(max_length=100, unique=False)
+    start_time = models.CharField(max_length=200, unique=False)
+
+class MarketDictionaryM(models.Model):
+    market_id = models.CharField(primary_key = True, max_length=50)
+    market_status = models.CharField(max_length = 50, default="", editable=False)
+    market_inPlay = models.CharField(max_length = 50, default="", editable=False)
+    market_removed = models.BooleanField(max_length = 50, default=False)
+
+class RunnerDictionaryM(models.Model):
+    runner_id = models.CharField(primary_key = True, max_length=50)
+    runner_status = models.CharField(max_length = 50, default="", editable=False)
+    runner_backPrice= models.CharField(max_length = 50, default="", editable=False)
+    runner_layPrice = models.CharField(max_length = 50, default="", editable=False)

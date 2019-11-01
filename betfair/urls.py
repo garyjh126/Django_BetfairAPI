@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic.base import TemplateView 
+from django.views.generic.base import TemplateView
 from django.conf import settings
 
 # Views are called here
@@ -34,4 +34,3 @@ if settings.DEBUG:
         # url(r'^__debug__/', include(debug_toolbar.urls)),
 
     ] + urlpatterns
-
