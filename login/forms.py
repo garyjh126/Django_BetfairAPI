@@ -22,7 +22,7 @@ class LoginForm(forms.Form):
     def log_betfair(self, username, password):
         LoginForm.payload = 'username='+username+'&password='+password
         LoginForm.headers = {'X-Application': keys.app_key, 'Content-Type': 'application/x-www-form-urlencoded'}
-        resp = requests.post('https://identitysso-cert.betfair.com/api/certlogin', data=self.payload, cert=('/home/gary/Desktop/Development/Betfair/Python/betfair/login/client-2048.crt', '/home/gary/Desktop/Development/Betfair/Python/betfair/login/client-2048.key'), headers=self.headers)
+        resp = requests.post('https://identitysso-cert.betfair.com/api/certlogin', data=self.payload, cert=(r"C:\Users\garyh\Desktop\keys\client-2048.crt", r"C:\Users\garyh\Desktop\keys\client-2048.key"), headers=self.headers)
 
         if resp.status_code == 200:
             resp_json = resp.json()

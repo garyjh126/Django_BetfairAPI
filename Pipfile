@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+celery = "==4.4.0rc3"
+kombu = "==4.6.5"
+django = "*"
+channels = "*"
+requests = "*"
+asgiref = "*"
+redis = "*"
+channels-redis = "*"
+pep8 = "*"
+autopep8 = "*"
+pylint = "*"
+
+[requires]
+python_version = "3.6"
